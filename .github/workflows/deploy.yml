@@ -1,11 +1,11 @@
-name: Build 
+name: Deploy 
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 11
-        
-    - name: Build
-      run: mvn clean install    
+ 
+    - name: Deploy Snapshots with Maven
+      run: mvn -B deploy --file pom.xml -s .github/workflows/maven_settings.xml -DretryFailedDeploymentCount=10
+      env:
+        CI_DEPLOY_USERNAME: ${{ secrets.CI_DEPLOY_USERNAME }}
+        CI_DEPLOY_PASSWORD: ${{ secrets.CI_DEPLOY_PASSWORD }}
